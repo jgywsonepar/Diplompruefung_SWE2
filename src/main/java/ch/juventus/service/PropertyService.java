@@ -31,4 +31,26 @@ public class PropertyService {
         return Collections.emptyList();
     }
 
+    public List<Apartment> getAllFreeApartments() {
+        return database.getAllProperties().stream()
+                .flatMap(property -> property.getApartments().stream())
+                .filter(apartment -> !apartment.isRented())
+                .collect(Collectors.toList());
+    }
+
+    public List<Property> getAllPropertiesInCity(String city) {
+        return database.getAllProperties().stream()
+                .filter(property -> property.getAddress().getCity().equalsIgnoreCase(city))
+                .collect(Collectors.toList());
+    }
+
+    public List<Apartment> getAllApartmentsSortedByNumberOfRooms() {
+        return database.getAllProperties().stream()
+                .flatMap(property -> property.getApartments().stream())
+                .sorted(Comparator
+                        .comparingInt(apartment -> apartment.getRooms().values().stream().mapToInt(Integer::intValue).sum())
+                        .thenComparing(Apartment::isRented))
+                .collect(Collectors.toList());
+    }
+
 }
